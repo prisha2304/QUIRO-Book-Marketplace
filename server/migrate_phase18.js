@@ -1,23 +1,16 @@
-const mysql = require('./node_modules/mysql2/promise');
-const dotenv = require('./node_modules/dotenv');
-dotenv.config({ path: 'server/.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config();
+const { pool } = require('./config/db');
 
 async function runPhase18Migration() {
     console.log('================================================================================');
-    console.log(' BOOKNEST -> FABLE & FOLIO — PHASE 18 DATABASE MIGRATION');
+    console.log(' QUIRO — PHASE 18 DATABASE MIGRATION');
     console.log('================================================================================');
 
-    let connection;
+    const connection = await pool.getConnection();
     try {
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST || 'localhost',
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME || 'booknest_chatgpt_ag',
-            port: process.env.DB_PORT || 3306
-        });
-
-        console.log('✔ Connected to database:', process.env.DB_NAME || 'booknest_chatgpt_ag');
+        console.log('✔ Connected to database via pool');
 
         // 1. Audit categories table columns and extend if needed
         const [catCols] = await connection.query('DESCRIBE categories');
@@ -188,10 +181,19 @@ async function runPhase18Migration() {
         console.log('================================================================================');
     } catch (err) {
         console.error('❌ Migration failed:', err);
-        process.exit(1);
+        throw err;
     } finally {
-        if (connection) await connection.end();
+        if (connection) connection.release();
     }
 }
 
-runPhase18Migration();
+if (require.main === module) {
+    runPhase18Migration()
+        .then(() => process.exit(0))
+        .catch(err => {
+            console.error('Phase 18 migration error:', err);
+            process.exit(1);
+        });
+}
+
+module.exports = { migrate: runPhase18Migration, runPhase18Migration };

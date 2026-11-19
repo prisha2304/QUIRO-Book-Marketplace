@@ -48,15 +48,23 @@ async function runMigration() {
 
         await connection.commit();
         console.log('--- Managed Exchange v2 Migration completed successfully! ---');
-        process.exit(0);
     } catch (err) {
         await connection.rollback();
         console.error('Migration failed:', err);
-        process.exit(1);
+        throw err;
     } finally {
         connection.release();
     }
 }
 
-runMigration();
+if (require.main === module) {
+    runMigration()
+        .then(() => process.exit(0))
+        .catch(err => {
+            console.error('Migration failed:', err);
+            process.exit(1);
+        });
+}
+
+module.exports = { migrate: runMigration, runMigration };
 

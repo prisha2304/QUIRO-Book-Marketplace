@@ -94,4 +94,4 @@ if (require.main === module) {
     migratePhase9().then(() => process.exit(0)).catch(() => process.exit(1));
 }
 
-module.exports = { migratePhase9 };
+module.exports = { migrate: migratePhase9, migratePhase9 };

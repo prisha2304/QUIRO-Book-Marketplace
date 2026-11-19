@@ -153,4 +153,4 @@ if (require.main === module) {
     migratePhase10().then(() => process.exit(0)).catch(() => process.exit(1));
 }
 
-module.exports = { migratePhase10 };
+module.exports = { migrate: migratePhase10, migratePhase10 };

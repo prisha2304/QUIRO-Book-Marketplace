@@ -1,6 +1,6 @@
 const { pool } = require('./config/db');
 
-async function migrate() {
+async function migratePhase6() {
     console.log('Creating Phase 6 tables...');
 
     await pool.query(`
@@ -77,10 +77,15 @@ async function migrate() {
     `);
 
     console.log('Phase 6 tables created successfully!');
-    process.exit(0);
 }
 
-migrate().catch(e => {
-    console.error('Phase 6 migration error:', e);
-    process.exit(1);
-});
+if (require.main === module) {
+    migratePhase6()
+        .then(() => process.exit(0))
+        .catch(e => {
+            console.error('Phase 6 migration error:', e);
+            process.exit(1);
+        });
+}
+
+module.exports = { migrate: migratePhase6, migratePhase6 };

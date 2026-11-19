@@ -9,8 +9,11 @@ function validateEnvironment() {
 
     const optional = [
         'DB_HOST',
+        'DB_PORT',
         'DB_USER',
         'DB_PASSWORD',
+        'DB_SSL',
+        'DB_SSL_REJECT_UNAUTHORIZED',
         'PORT',
         'REDIS_HOST',
         'REDIS_PORT',
